@@ -1,0 +1,419 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0990a481-3bc8-4682-838c-313918dd858c')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0990a481-3bc8-4682-838c-313918dd858c')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2021-10-01-preview",
+            "properties": {
+                "displayName": "Conditional Access - A Conditional Access app exclusion has changed",
+                "description": "A Conditional Access app exclusion has changed in Azure AD.",
+                "severity": "Low",
+                "enabled": true,
+                "query": "// A Conditional Access app exclusion has changed.\r\nAuditLogs\r\n| where OperationName  in (\"Update conditional access policy\")\r\n| extend excludeApplicationsOld=extractjson(\"$.conditions.applications.excludeApplications\", tostring(TargetResources[0].modifiedProperties[0].oldValue))\r\n| extend excludeApplicationsNew=extractjson(\"$.conditions.applications.excludeApplications\", tostring(TargetResources[0].modifiedProperties[0].newValue))\r\n| where excludeApplicationsOld != excludeApplicationsNew\r\n| project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, excludeApplicationsOld, excludeApplicationsNew\r\n| order by TimeGenerated desc",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [],
+                "techniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT1H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "AadUserId",
+                                "columnName": "modifiedBy"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/e3368079-a2c0-4f1c-9fb7-287e907393ef')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/e3368079-a2c0-4f1c-9fb7-287e907393ef')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2021-10-01-preview",
+            "properties": {
+                "displayName": "Conditional Access - A Conditional Access Device platforms condition has changed (the Device platforms condition can be spoofed)",
+                "description": "A Conditional Access Device platforms condition has changed (the Device platforms condition can be spoofed) in Azure AD.",
+                "severity": "Low",
+                "enabled": true,
+                "query": "// A Conditional Access Device platforms condition has changed (the Device platforms condition can be spoofed).\r\nAuditLogs\r\n| where OperationName  in (\"Update conditional access policy\")\r\n| extend excludePlatformsOld=extractjson(\"$.conditions.platforms.excludePlatforms\", tostring(TargetResources[0].modifiedProperties[0].oldValue))\r\n| extend excludePlatformsNew=extractjson(\"$.conditions.platforms.excludePlatforms\", tostring(TargetResources[0].modifiedProperties[0].newValue))\r\n| where excludePlatformsOld != excludePlatformsNew\r\n| project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, excludePlatformsOld",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [],
+                "techniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT1H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "AadUserId",
+                                "columnName": "modifiedBy"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/2e96fa64-ac4d-4c92-b79e-e9c54b5d8230')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/2e96fa64-ac4d-4c92-b79e-e9c54b5d8230')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2021-10-01-preview",
+            "properties": {
+                "displayName": "Conditional Access - A Conditional Access policy was deleted",
+                "description": "A Conditional Access policy was deleted from Azure AD.",
+                "severity": "Low",
+                "enabled": true,
+                "query": "// A Conditional Access policy was deleted.\r\nAuditLogs\r\n| where OperationName  in (\"Delete conditional access policy\")\r\n| project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, oldPolicy=TargetResources[0].modifiedProperties[0].oldValue\r\n| order by TimeGenerated desc",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [],
+                "techniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT1H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "AadUserId",
+                                "columnName": "modifiedBy"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/40702da1-ae8a-4e46-ac1f-9327ca6ef588')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/40702da1-ae8a-4e46-ac1f-9327ca6ef588')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2021-10-01-preview",
+            "properties": {
+                "displayName": "Conditional Access - A Conditional Access policy was disabled",
+                "description": "A Conditional Access policy was disabled in Azure AD.",
+                "severity": "Low",
+                "enabled": true,
+                "query": "// A Conditional Access policy was disabled.\r\nAuditLogs\r\n| where OperationName  in (\"Update conditional access policy\")\r\n| extend stateOld=extractjson(\"$.state\", tostring(TargetResources[0].modifiedProperties[0].oldValue))\r\n| extend stateNew=extractjson(\"$.state\", tostring(TargetResources[0].modifiedProperties[0].newValue))\r\n| where stateOld == \"enabled\" and stateNew == \"disabled\" \r\n| project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, stateOld, stateNew\r\n| order by TimeGenerated desc",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [],
+                "techniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT1H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "AadUserId",
+                                "columnName": "modifiedBy"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/5588de32-73b1-40b9-bddc-4d9e74051859')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/5588de32-73b1-40b9-bddc-4d9e74051859')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2021-10-01-preview",
+            "properties": {
+                "displayName": "Conditional Access - A Conditional Access policy was put into report-only mode",
+                "description": "A Conditional Access policy was put into report-only mode in Azure AD.",
+                "severity": "Low",
+                "enabled": true,
+                "query": "// A Conditional Access policy was put into report-only mode.\r\nAuditLogs\r\n| where OperationName  in (\"Update conditional access policy\")\r\n| extend stateOld=extractjson(\"$.state\", tostring(TargetResources[0].modifiedProperties[0].oldValue))\r\n| extend stateNew=extractjson(\"$.state\", tostring(TargetResources[0].modifiedProperties[0].newValue))\r\n| where stateOld == \"enabled\" and stateNew == \"enabledForReportingButNotEnforced\" \r\n| project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, stateOld, stateNew\r\n| order by TimeGenerated desc",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [],
+                "techniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "AadUserId",
+                                "columnName": "modifiedBy"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/2ce7f00d-3b3c-41b9-ae9a-b79c19d2394e')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/2ce7f00d-3b3c-41b9-ae9a-b79c19d2394e')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2021-10-01-preview",
+            "properties": {
+                "displayName": "Conditional Access - A Conditional Access user/group/role exclusion has changed",
+                "description": "A Conditional Access user/group/role exclusion has changed in Azure AD.",
+                "severity": "Low",
+                "enabled": true,
+                "query": "// A Conditional Access user/group/role exclusion has changed.\r\nAuditLogs\r\n| where OperationName  in (\"Update conditional access policy\")\r\n| extend excludeUsersOld=extractjson(\"$.conditions.users.excludeUsers\", tostring(TargetResources[0].modifiedProperties[0].oldValue))\r\n| extend excludeGroupsOld=extractjson(\"$.conditions.users.excludeGroups\", tostring(TargetResources[0].modifiedProperties[0].oldValue))\r\n| extend excludeRolesOld=extractjson(\"$.conditions.users.excludeRoles\", tostring(TargetResources[0].modifiedProperties[0].oldValue))\r\n| extend excludeUsersNew=extractjson(\"$.conditions.users.excludeUsers\", tostring(TargetResources[0].modifiedProperties[0].newValue))\r\n| extend excludeGroupsNew=extractjson(\"$.conditions.users.excludeGroups\", tostring(TargetResources[0].modifiedProperties[0].newValue))\r\n| extend excludeRolesNew=extractjson(\"$.conditions.users.excludeRoles\", tostring(TargetResources[0].modifiedProperties[0].newValue))\r\n| where excludeUsersOld != excludeUsersNew or excludeGroupsOld != excludeGroupsNew or excludeRolesOld != excludeRolesNew\r\n| project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, excludeUsersOld, excludeUsersNew, excludeGroupsOld, excludeGroupsNew, excludeRolesOld, excludeRolesNew\r\n| order by TimeGenerated desc",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [],
+                "techniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT1H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "AadUserId",
+                                "columnName": "modifiedBy"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/ccca6b88-a7b6-41c9-9be2-fc3daeb65b26')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/ccca6b88-a7b6-41c9-9be2-fc3daeb65b26')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2021-10-01-preview",
+            "properties": {
+                "displayName": "Conditional Access - A Conditional Access policy was updated",
+                "description": "A Conditional Access policy was updated in Azure AD.",
+                "severity": "Informational",
+                "enabled": true,
+                "query": "// A Conditional Access policy was updated.\r\nAuditLogs\r\n| where OperationName  in (\"Update conditional access policy\")\r\n| project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, oldPolicy=TargetResources[0].modifiedProperties[0].oldValue, newPolicy=TargetResources[0].modifiedProperties[0].newValue\r\n| order by TimeGenerated desc",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [],
+                "techniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT1H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "AadUserId",
+                                "columnName": "modifiedBy"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/0459a1b5-909d-4783-9e27-24536b05a47f')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/0459a1b5-909d-4783-9e27-24536b05a47f')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2021-10-01-preview",
+            "properties": {
+                "displayName": "Conditional Access - A new Conditional Access policy was created",
+                "description": "A new Conditional Access policy was created in Azure AD.",
+                "severity": "Informational",
+                "enabled": true,
+                "query": "// A new Conditional Access policy was created.\r\nAuditLogs\r\n| where OperationName  in (\"Add conditional access policy\")\r\n| project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, newPolicy=TargetResources[0].modifiedProperties[0].newValue\r\n| order by TimeGenerated desc",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "tactics": [],
+                "techniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT1H",
+                        "matchingMethod": "AllEntities",
+                        "groupByEntities": [],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": []
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": null,
+                "customDetails": null,
+                "entityMappings": [
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "AadUserId",
+                                "columnName": "modifiedBy"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,203 @@
+{
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 1,
+        "content": {
+          "json": "# Conditional Access Change Dashboard\n---\n\nVersion: 2022.2\n\nCreated by: Daniel Chronlund (https://danielchronlund.com)"
+        },
+        "name": "text - heading"
+      },
+      {
+        "type": 9,
+        "content": {
+          "version": "KqlParameterItem/1.0",
+          "parameters": [
+            {
+              "id": "e327ae2b-6659-4d53-98d7-7326e30a893a",
+              "version": "KqlParameterItem/1.0",
+              "name": "TimeRange",
+              "type": 4,
+              "isRequired": true,
+              "typeSettings": {
+                "selectableValues": [
+                  {
+                    "durationMs": 86400000
+                  },
+                  {
+                    "durationMs": 259200000
+                  },
+                  {
+                    "durationMs": 604800000
+                  },
+                  {
+                    "durationMs": 1209600000
+                  },
+                  {
+                    "durationMs": 2592000000,
+                    "isInitialTime": true
+                  },
+                  {
+                    "durationMs": 7776000000
+                  }
+                ],
+                "allowCustom": true
+              },
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "value": {
+                "durationMs": 2592000000
+              }
+            }
+          ],
+          "style": "pills",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "name": "parameters - TimeRange",
+        "styleSettings": {
+          "margin": "0",
+          "padding": "0"
+        }
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AuditLogs\r\n| where OperationName in (\"Add conditional access policy\", \"Update conditional access policy\", \"Delete conditional access policy\")\r\n| summarize count() by OperationName, bin(TimeGenerated, 1d)",
+          "size": 1,
+          "title": "Conditional Access Change History",
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "barchart",
+          "chartSettings": {
+            "seriesLabelSettings": [
+              {
+                "seriesName": "Update conditional access policy",
+                "color": "blue"
+              },
+              {
+                "seriesName": "Add conditional access policy",
+                "color": "green"
+              },
+              {
+                "seriesName": "Delete conditional access policy",
+                "color": "redBright"
+              }
+            ]
+          }
+        },
+        "customWidth": "60",
+        "name": "query - changehistory",
+        "styleSettings": {
+          "showBorder": true
+        }
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AuditLogs\r\n| where OperationName  in (\"Add conditional access policy\", \"Update conditional access policy\", \"Delete conditional access policy\")\r\n| project modifiedBy=tostring(InitiatedBy.user.userPrincipalName)\r\n| summarize count() by modifiedBy\r\n| order by count_ desc",
+          "size": 1,
+          "title": "Conditional Access Top Editors",
+          "timeContextFromParameter": "TimeRange",
+          "exportFieldName": "modifiedBy",
+          "exportParameterName": "modifiedBy",
+          "exportDefaultValue": "*",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "piechart"
+        },
+        "customWidth": "40",
+        "name": "query - topeditors",
+        "styleSettings": {
+          "showBorder": true
+        }
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AuditLogs\r\n| where OperationName  in (\"Add conditional access policy\", \"Update conditional access policy\", \"Delete conditional access policy\")\r\n| project TimeGenerated, Operation=OperationName, Policy=TargetResources[0].displayName, ModifiedBy=InitiatedBy.user.userPrincipalName, CorrelationId\r\n| order by TimeGenerated desc",
+          "size": 1,
+          "title": "Conditional Access Change Log (click for comparison)",
+          "timeContextFromParameter": "TimeRange",
+          "exportFieldName": "CorrelationId",
+          "exportParameterName": "SelectedCorrelationId",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "name": "query - changelog",
+        "styleSettings": {
+          "showBorder": true
+        }
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "let OldPolicy = AuditLogs\r\n| where CorrelationId == \"{SelectedCorrelationId}\"\r\n| where OperationName  in (\"Add conditional access policy\", \"Update conditional access policy\", \"Delete conditional access policy\")\r\n| extend Policy=todynamic(tostring(TargetResources[0].modifiedProperties[0].oldValue))\r\n| project Policy\r\n| extend version=\"OldVersion\"\r\n;\r\nlet NewPolicy = AuditLogs\r\n| where CorrelationId == \"{SelectedCorrelationId}\"\r\n| where OperationName  in (\"Add conditional access policy\", \"Update conditional access policy\", \"Delete conditional access policy\")\r\n| extend Policy=todynamic(tostring(TargetResources[0].modifiedProperties[0].newValue))\r\n| project Policy\r\n| extend version=\"NewVersion\"\r\n;\r\nunion OldPolicy, NewPolicy\r\n| order by version desc\r\n| extend grantControls = todynamic(\"\")\r\n| extend sessionControls = todynamic(\"\")\r\n| evaluate bag_unpack(Policy, columnsConflict='replace_source')\r\n| evaluate bag_unpack(conditions, columnsConflict='replace_source')\r\n| evaluate bag_unpack(grantControls, columnsConflict='replace_source')\r\n| evaluate bag_unpack(sessionControls, columnsConflict='replace_source')\r\n| project-away id",
+          "size": 4,
+          "title": "Change Comparison",
+          "timeContextFromParameter": "TimeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "visualization": "table",
+          "tileSettings": {
+            "showBorder": false,
+            "titleContent": {
+              "columnMatch": "TenantId",
+              "formatter": 1
+            },
+            "leftContent": {
+              "columnMatch": "DurationMs",
+              "formatter": 12,
+              "formatOptions": {
+                "palette": "auto"
+              },
+              "numberFormat": {
+                "unit": 17,
+                "options": {
+                  "maximumSignificantDigits": 3,
+                  "maximumFractionDigits": 2
+                }
+              }
+            }
+          },
+          "graphSettings": {
+            "type": 0,
+            "topContent": {
+              "columnMatch": "TenantId",
+              "formatter": 1
+            },
+            "centerContent": {
+              "columnMatch": "DurationMs",
+              "formatter": 1,
+              "numberFormat": {
+                "unit": 17,
+                "options": {
+                  "maximumSignificantDigits": 3,
+                  "maximumFractionDigits": 2
+                }
+              }
+            }
+          },
+          "mapSettings": {
+            "locInfo": "LatLong"
+          }
+        },
+        "conditionalVisibility": {
+          "parameterName": "SelectedCorrelationId",
+          "comparison": "isNotEqualTo"
+        },
+        "name": "query - comparison",
+        "styleSettings": {
+          "showBorder": true
+        }
+      }
+    ],
+    "fromTemplateId": "sentinel-UserWorkbook",
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }
