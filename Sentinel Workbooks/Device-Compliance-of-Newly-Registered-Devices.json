@@ -1,0 +1,115 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# Device Compliance of Newly Registered Devices\r\n---\r\n\r\nVersion: 2022.1\r\n\r\nCreated by: Daniel Chronlund (https://danielchronlund.com)\r\n\r\n## Instructions:\r\n\r\n1 - Check the isCompliant column of all new devices monitored in the NewDevices watchlist.\r\n\r\n2 - Investigate any non-compliant devices and make sure the are secured.\r\n\r\n3 - Remove secured devices from the watchlist.\r\n\r\n4 - Repeat.\r\n\r\n---"
+      },
+      "name": "text - Heading"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "// List the latest status of devices in the NewDevices watchlist. Make sure a device is reporting isCompliant before removing it from the list, otherwise investigate further.\r\nlet NewDevices = _GetWatchlist('NewDevices');\r\nSigninLogs\r\n| where TimeGenerated > ago(30d)\r\n| where DeviceDetail.deviceId != \"\"\r\n| extend DeviceId=tostring(DeviceDetail.deviceId)\r\n| join kind=inner (\r\n    NewDevices\r\n    | project tostring(HostName) \r\n) on $left.DeviceId == $right.HostName\r\n| summarize arg_max(LastSignIn=TimeGenerated, displayName=tostring(DeviceDetail.displayName), isCompliant=tostring(DeviceDetail.isCompliant), LastUser=UserPrincipalName, operatingSystem=tostring(DeviceDetail.operatingSystem)) by deviceId=tostring(DeviceDetail.deviceId), trustType=tostring(DeviceDetail.trustType)\r\n| project deviceId, displayName, operatingSystem, trustType, isCompliant, LastUser, LastSignIn\r\n| order by displayName asc",
+        "size": 1,
+        "title": "Compliance status of new devices",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "sortBy": [
+            {
+              "itemKey": "displayName",
+              "sortOrder": 2
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "displayName",
+            "sortOrder": 2
+          }
+        ]
+      },
+      "name": "query - Device list",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let NewDevices = _GetWatchlist('NewDevices');\r\nSigninLogs\r\n| where TimeGenerated > ago(30d)\r\n| where DeviceDetail.deviceId != \"\"\r\n| extend DeviceId=tostring(DeviceDetail.deviceId)\r\n| join kind=inner (\r\n    NewDevices\r\n    | project tostring(HostName) \r\n) on $left.DeviceId == $right.HostName\r\n| summarize arg_max(LastSignIn=TimeGenerated, displayName=tostring(DeviceDetail.displayName), isCompliant=tostring(DeviceDetail.isCompliant), LastUser=UserPrincipalName, operatingSystem=tostring(DeviceDetail.operatingSystem)) by deviceId=tostring(DeviceDetail.deviceId), trustType=tostring(DeviceDetail.trustType)\r\n| summarize count() by isCompliant",
+        "size": 0,
+        "title": "Newly registered devices by compliance state",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "33",
+      "name": "query - Compliance state"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let NewDevices = _GetWatchlist('NewDevices');\r\nSigninLogs\r\n| where TimeGenerated > ago(30d)\r\n| where DeviceDetail.deviceId != \"\"\r\n| extend DeviceId=tostring(DeviceDetail.deviceId)\r\n| join kind=inner (\r\n    NewDevices\r\n    | project tostring(HostName) \r\n) on $left.DeviceId == $right.HostName\r\n| summarize arg_max(LastSignIn=TimeGenerated, displayName=tostring(DeviceDetail.displayName), isCompliant=tostring(DeviceDetail.isCompliant), LastUser=UserPrincipalName, operatingSystem=tostring(DeviceDetail.operatingSystem)) by deviceId=tostring(DeviceDetail.deviceId), trustType=tostring(DeviceDetail.trustType)\r\n| summarize count() by operatingSystem",
+        "size": 0,
+        "title": "Newly registered devices by operating system",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "33",
+      "name": "query - Operating system"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let NewDevices = _GetWatchlist('NewDevices');\r\nSigninLogs\r\n| where TimeGenerated > ago(30d)\r\n| where DeviceDetail.deviceId != \"\"\r\n| extend DeviceId=tostring(DeviceDetail.deviceId)\r\n| join kind=inner (\r\n    NewDevices\r\n    | project tostring(HostName) \r\n) on $left.DeviceId == $right.HostName\r\n| summarize arg_max(LastSignIn=TimeGenerated, displayName=tostring(DeviceDetail.displayName), isCompliant=tostring(DeviceDetail.isCompliant), LastUser=UserPrincipalName, operatingSystem=tostring(DeviceDetail.operatingSystem)) by deviceId=tostring(DeviceDetail.deviceId), trustType=tostring(DeviceDetail.trustType)\r\n| summarize count() by trustType",
+        "size": 0,
+        "title": "Newly registered devices by trust type",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "33",
+      "name": "query - Trust type"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "let NewDevices = _GetWatchlist('NewDevices');\r\nNewDevices\r\n| project LastUpdatedTimeUTC, HostName\r\n| order by LastUpdatedTimeUTC asc",
+        "size": 1,
+        "title": "Current device ID's in NewDevices Sentinel watchlist (raw content)",
+        "timeContext": {
+          "durationMs": 2592000000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - Raw content",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "fromTemplateId": "sentinel-UserWorkbook",
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
