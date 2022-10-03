@@ -1,0 +1,31 @@
+id: 266ded7d-0f6a-4821-9b99-818a9f5770e5
+name: Sign-ins originating from an unknown network (not in Named Location), that don't require MFA [DCSecurityOperations]
+description: |
+  'Sign-ins targeted by Conditional Access (past 30 days), originating from an unknown network (not in Named Location), that don't require MFA. The purpose is to find sign-ins originating from untrusted networks that still don't require MFA.'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - SigninLogs
+tactics:
+  - Initial Access
+relevantTechniques:
+  - T1078.004
+query: |
+
+  // Sign-ins targeted by Conditional Access, originating from an unknown network (not in Named Location), that don't require MFA. The purpose is to find sign-ins originating from untrusted networks that still don't require MFA.
+  SigninLogs
+  | where TimeGenerated > ago(30d)
+  | where AuthenticationRequirement != "multiFactorAuthentication"
+  | where tostring(NetworkLocationDetails) == "[]"
+  | where ConditionalAccessStatus == "success"
+  | where AppDisplayName != "Microsoft Intune Company Portal"
+  | where AppDisplayName != "Microsoft Office Web Apps Service"
+  | where ResourceDisplayName != "Microsoft Intune Enrollment"
+  | project UserPrincipalName, AppDisplayName, ResourceDisplayName, NetworkLocationDetails, AuthenticationRequirement
+  | summarize count() by UserPrincipalName, AppDisplayName, ResourceDisplayName, AuthenticationRequirement
+  | sort by UserPrincipalName asc, count_ desc
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: UserPrincipalName

@@ -1,0 +1,39 @@
+id: 2e572cdc-86e7-4fb1-8d1e-58ee008b6ffc
+name: Recently created Azure AD service principals created by new user accounts [DCSecurityOperations]
+description: |
+  'Hunt for newly created service principals (past 30 days) created by new user accounts.'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Persistence
+  - LateralMovement
+relevantTechniques:
+  - T1136
+  - T1098.001
+query: |
+
+  // Recently created Azure AD service principals created by new user accounts [DCSecurityOperations].
+  let NewUsers = AuditLogs
+      | where OperationName == "Add user"
+      | where TimeGenerated > ago(30days)
+      | extend UserID = tostring(TargetResources[0].id)
+      | project NewUser = TargetResources[0].userPrincipalName, UserID, UserCreated = TimeGenerated;
+  let NewServicePrincipals = AuditLogs
+      | where OperationName == "Add service principal"
+      | where TimeGenerated > ago(30days)
+      | project ServicePrincipalDisplayName = TargetResources[0].displayName, ServicePrincipalCreated = TimeGenerated, InitiatedBy = InitiatedBy.user.userPrincipalName;
+  NewServicePrincipals
+      | extend InitiatedBy = tostring(InitiatedBy)
+      | join kind=inner (
+          NewUsers
+          | extend NewUser = tostring(NewUser)
+      ) on $left.InitiatedBy == $right.NewUser
+      | project ServicePrincipalDisplayName, ServicePrincipalCreated, InitiatedBy, UserCreated, UserID
+      | order by ServicePrincipalCreated
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: UserID

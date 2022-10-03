@@ -1,0 +1,25 @@
+id: 933a3c99-8f60-4e9d-9ebe-fd87d7453b41
+name: Get all Conditional Access policy update events [DCSecurityOperations]
+description: |
+  'Hunt for Conditional Access update events in Azure AD (past 30 days).'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1556
+query: |
+
+  // Get all Conditional Access policy update events [DCSecurityOperations].
+  AuditLogs
+  | where TimeGenerated > ago(30d)
+  | where OperationName in ("Add conditional access policy", "Update conditional access policy", "Delete conditional access policy")
+  | project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, oldPolicy=TargetResources[0].modifiedProperties[0].oldValue, newPolicy=TargetResources[0].modifiedProperties[0].newValue
+  | order by TimeGenerated
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: modifiedBy

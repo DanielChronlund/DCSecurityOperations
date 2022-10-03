@@ -1,0 +1,25 @@
+id: ef33c2d4-4f34-4910-ba77-92fb7f685869
+name: Administrative Unit events in Azure AD audit logs [DCSecurityOperations]
+description: |
+  'Hunt for Administrative Unit events in Azure AD audit logs (past 30 days). These events should be rare. Make sure they are legitimate.'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Privilege Escalation
+relevantTechniques:
+  - T1548
+query: |
+
+  // Administrative Unit events in Azure AD audit logs [DCSecurityOperations].
+  AuditLogs
+  | where TimeGenerated > ago(30days)
+  | where OperationName in ("Add administrative unit", "Delete administrative unit", "Update administrative unit")
+  | project TimeGenerated, OperationName, InitiatedBy=InitiatedBy.user.userPrincipalName, TargetResources
+  | order by TimeGenerated desc
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: InitiatedBy

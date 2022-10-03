@@ -1,51 +1,33 @@
-New Azure AD User Added to Azure AD Role
+id: 9c2fc25b-d82b-4d0f-9409-c20c5345f2b4
+name: New Azure AD users added to Azure AD roles [DCSecurityOperations]
+description: |
+  'Hunt for newly added users (past 30 days) that were added to an Azure AD role soon after its creation.'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Persistence
+  - LateralMovement
+relevantTechniques:
+  - T1136
+  - T1098.003
+query: |
 
-Get all new user accounts that were added to an Azure AD role soon after.
-
-// New Users Added to Azure AD Role.
-let NewUsers = AuditLogs
-    | where ActivityDisplayName == "Add user"
-    | extend UserID = tostring(TargetResources[0].id);
-let NewAdmins = AuditLogs
-    | where ActivityDisplayName == "Add member to role"
-    | extend UserID = tostring(TargetResources[0].id);
-NewUsers
-    | join (NewAdmins) on UserID
-    | project UserCreatedTimestamp=TimeGenerated, UserPrincipalName=tostring(TargetResources[0].userPrincipalName), UserID, AdminRoleAddedTimestamp=TimeGenerated1, AdminRole=tostring(TargetResources1[0].modifiedProperties[1].newValue), InitiatedBy=tostring(InitiatedBy1.user.userPrincipalName)
-
-
-// Get all recently created service principals in Azure AD that was created by new user accounts.
-let NewUsers = AuditLogs
-    | where OperationName == "Add user"
-    | where TimeGenerated > ago(30days)
-    | project NewUser = TargetResources[0].userPrincipalName, UserCreated = TimeGenerated;
-let NewServicePrincipals = AuditLogs
-    | where OperationName == "Add service principal"
-    | where TimeGenerated > ago(30days)
-    | project ServicePrincipalDisplayName = TargetResources[0].displayName, ServicePrincipalCreated = TimeGenerated, InitiatedBy = InitiatedBy.user.userPrincipalName;
-NewServicePrincipals
-    | extend InitiatedBy = tostring(InitiatedBy)
-    | join kind=inner (
-        NewUsers
-        | extend NewUser = tostring(NewUser)
-    ) on $left.InitiatedBy == $right.NewUser
-    | project ServicePrincipalDisplayName, ServicePrincipalCreated, InitiatedBy, UserCreated
-    | order by ServicePrincipalCreated
-
-
-// Get all newly registered devices in Azure AD.
-let NewDevices = AuditLogs
-    | where OperationName == "Register device"
-    | project TimeGenerated, DeviceID=AdditionalDetails[4].value, OS=AdditionalDetails[3].value, DeviceTrustType=AdditionalDetails[2].value, InitiatedBy=InitiatedBy.user.userPrincipalName;
-let DisplayNames = AuditLogs
-    | where OperationName == "Add device"
-    | extend Replaced=replace_string(tostring(TargetResources[0].modifiedProperties[6].newValue), '[\"', '')
-    | project DeviceID=replace_string(Replaced, '\"]', ''), DeviceName=TargetResources[0].displayName;
-NewDevices
-    | extend DeviceID = tostring(DeviceID)
-    | join kind=inner (
-        DisplayNames
-        | extend DeviceID = tostring(DeviceID)
-    ) on $left.DeviceID == $right.DeviceID
-    | summarize by TimeGenerated, DeviceID, tostring(DeviceName), tostring(OS), tostring(DeviceTrustType), tostring(InitiatedBy)
-    | order by TimeGenerated
+  // New Azure AD users added to Azure AD roles [DCSecurityOperations].
+  let NewUsers = AuditLogs
+      | where TimeGenerated > ago(30d)
+      | where ActivityDisplayName == "Add user"
+      | extend UserID = tostring(TargetResources[0].id);
+  let NewAdmins = AuditLogs
+      | where TimeGenerated > ago(30d)
+      | where ActivityDisplayName == "Add member to role"
+      | extend UserID = tostring(TargetResources[0].id);
+  NewUsers
+      | join (NewAdmins) on UserID
+      | project UserCreatedTimestamp=TimeGenerated, UserPrincipalName=tostring(TargetResources[0].userPrincipalName), UserID, AdminRoleAddedTimestamp=TimeGenerated1, AdminRole=tostring(TargetResources1[0].modifiedProperties[1].newValue), InitiatedBy=tostring(InitiatedBy1.user.userPrincipalName)
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: UserID

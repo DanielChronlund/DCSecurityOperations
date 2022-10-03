@@ -4,7 +4,7 @@
     {
       "type": 1,
       "content": {
-        "json": "# Device Compliance of Newly Registered Devices\r\n---\r\n\r\nVersion: 2022.1\r\n\r\nCreated by: Daniel Chronlund (https://danielchronlund.com)\r\n\r\n## Instructions:\r\n\r\n1 - Check the isCompliant column of all new devices monitored in the NewDevices watchlist.\r\n\r\n2 - Investigate any non-compliant devices and make sure the are secured.\r\n\r\n3 - Remove secured devices from the watchlist.\r\n\r\n4 - Repeat.\r\n\r\n---"
+        "json": "# Device Compliance of Newly Registered Devices\r\n---\r\n\r\nVersion: 2022.1\r\n\r\nCreated by: Daniel Chronlund (https://danielchronlund.com)\r\n\r\n## Instructions:\r\n\r\n1 - Check the isCompliant column of all new devices monitored in the NewDevices watchlist.\r\n\r\n2 - Investigate any non-compliant devices and make sure they are secured.\r\n\r\n3 - Remove secured devices from the watchlist.\r\n\r\n4 - Repeat.\r\n\r\n---"
       },
       "name": "text - Heading"
     },

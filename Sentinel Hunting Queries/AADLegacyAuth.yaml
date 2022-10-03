@@ -1,0 +1,26 @@
+id: 7f1bf1e4-a4ff-43bc-b4cf-01d4f3716aed
+name: Legacy authentication in Azure AD [DCSecurityOperations]
+description: |
+  'Hunt for legacy authentication events in Azure AD sign-ins log (past 30 days).'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - SigninLogs
+tactics:
+  - Initial Access
+relevantTechniques:
+  - T1078.004
+query: |
+
+  // Legacy authentication in Azure AD [DCSecurityOperations].
+  SigninLogs
+  | where TimeGenerated > ago(30d)
+  | where Status.errorCode == 0
+  | where ClientAppUsed !in("Browser", "modern clients", "Mobile Apps and Desktop clients", "")
+  | summarize count() by UserPrincipalName, AppDisplayName, ClientAppUsed
+  | order by count_ desc
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: UserID

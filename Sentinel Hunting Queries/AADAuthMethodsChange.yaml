@@ -1,0 +1,25 @@
+id: b06ae167-340a-43f2-bb95-3efdaccd8053
+name: Changes in Azure AD Authentication Methods configuration [DCSecurityOperations]
+description: |
+  'Hunt for configuration changes in Azure AD Authentication Methods and authentication policies (past 30 days). These events should be rare. Make sure they are legitimate.'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1556
+query: |
+
+  // Changes in Azure AD Authentication Methods configuration [DCSecurityOperations].
+  AuditLogs
+  | where TimeGenerated > ago(30days)
+  | where OperationName in ("Authentication Methods Policy Reset", "Authentication Methods Policy Update", "Authentication Strength Combination Configuration Create", "Authentication Strength Combination Configuration Delete", "Authentication Strength Combination Configuration Update", "Authentication Strength Policy Create", "Authentication Strength Policy Delete", "Authentication Strength Policy Update", "Disable Strong Authentication", "Update the company default cross-tenant access setting", "Update security defaults", "Update authorization policy", "Update Sign-In Risk Policy", "Set password policy", "Set domain authentication", "Set device registration policies", "Reveal local administrator password", "Reset the cross-tenant access default setting")
+  | project TimeGenerated, OperationName, InitiatedBy=InitiatedBy.user.userPrincipalName, TargetResources
+  | order by TimeGenerated desc
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: InitiatedBy

@@ -1,0 +1,25 @@
+id: 65fc5f93-ea4f-4aa2-9044-030060155e3e
+name: Risk confirmations in Azure AD Identity Protection [DCSecurityOperations]
+description: |
+  'Hunt for manual or automatic risk confirmations in Azure AD Identity Protectoin (past 30 days).'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1098
+query: |
+
+  // Risk confirmations in Azure AD Identity Protection [DCSecurityOperations].
+  AuditLogs
+  | where TimeGenerated > ago(30days)
+  | where OperationName in ("ConfirmAccountCompromised", "ConfirmCompromised", "ConfirmSafe", "ConfirmServicePrincipalCompromised", "confirmServicePrincipalCompromised", "dismissServicePrincipal")
+  | project TimeGenerated, OperationName, ResultDescription, InitiatedBy=InitiatedBy.user.userPrincipalName, TargetResources
+  | order by TimeGenerated desc
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: InitiatedBy

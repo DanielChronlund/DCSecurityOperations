@@ -1,0 +1,25 @@
+id: 6479256a-e636-4f9b-af7a-dc4ccaded563
+name: Users declining Conditional Access Terms of Use (potential insider risk) [DCSecurityOperations]
+description: |
+  'Users not accepting the corporate Terms of Use are usually not allowed to use company IT resources. This might indicate an insider risk.'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Initial Access
+relevantTechniques:
+  - T1078
+query: |
+
+  // Users declining Conditional Access Terms of Use (potential insider risk) [DCSecurityOperations].
+  AuditLogs
+  | where TimeGenerated > ago(30days)
+  | where OperationName in ("Decline Terms Of Use")
+  | project TimeGenerated, OperationName, ResultDescription, InitiatedBy=InitiatedBy.user.userPrincipalName, TargetResources
+  | order by TimeGenerated desc
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: InitiatedBy

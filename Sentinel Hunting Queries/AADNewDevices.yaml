@@ -1,0 +1,37 @@
+id: 0dd38ea7-724e-45cb-8cd4-7de1e08c499d
+name: Newly registered devices in Azure AD [DCSecurityOperations]
+description: |
+  'Hunt for newly registered devices in Azure AD (past 30 days).'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1098.005
+query: |
+
+  // Newly registered devices in Azure AD [DCSecurityOperations].
+  let NewDevices = AuditLogs
+      | where OperationName == "Register device"
+      | where TimeGenerated > ago(30d)
+      | project TimeGenerated, DeviceID=AdditionalDetails[4].value, OS=AdditionalDetails[3].value, DeviceTrustType=AdditionalDetails[2].value, InitiatedBy=InitiatedBy.user.userPrincipalName;
+  let DisplayNames = AuditLogs
+      | where OperationName == "Add device"
+      | where TimeGenerated > ago(30d)
+      | extend Replaced=replace_string(tostring(TargetResources[0].modifiedProperties[6].newValue), '[\"', '')
+      | project DeviceID=replace_string(Replaced, '\"]', ''), DeviceName=TargetResources[0].displayName;
+  NewDevices
+      | extend DeviceID = tostring(DeviceID)
+      | join kind=inner (
+          DisplayNames
+          | extend DeviceID = tostring(DeviceID)
+      ) on $left.DeviceID == $right.DeviceID
+      | summarize by TimeGenerated, DeviceID, tostring(DeviceName), tostring(OS), tostring(DeviceTrustType), tostring(InitiatedBy)
+      | order by TimeGenerated
+entityMappings:
+  - entityType: Host
+    fieldMappings:
+      - identifier: HostName
+        columnName: DeviceName
