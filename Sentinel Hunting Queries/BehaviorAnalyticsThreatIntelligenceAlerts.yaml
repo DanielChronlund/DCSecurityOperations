@@ -1,0 +1,26 @@
+id: fb42bee5-1a76-4835-bd9d-233aab97e8c4
+name: UEBA threat intelligence alerts, like Tor exit nodes, bot net members and other threats [DCSecurityOperations]
+description: |
+  'Hunt for threat intelligence matches in the Sentinel UEBA table. This will indicate if any IP-address used by a user is associated with a, by Microsoft, known threat.'
+requiredDataConnectors:
+  - connectorId: BehaviorAnalytics
+    dataTypes:
+      - SigninLogs
+tactics:
+  - Execution
+relevantTechniques:
+  - 
+query: |
+
+  // UEBA threat intelligence alerts like Tor exit nodes, bot net members and other threats.
+  BehaviorAnalytics
+  | where TimeGenerated > ago(90d)
+  | extend ThreatIntelIndicatorDescription = DevicesInsights.ThreatIntelIndicatorDescription
+  | where isnotempty( ThreatIntelIndicatorDescription ) 
+  | project TimeGenerated, ActivityType, UserPrincipalName, SourceIPAddress, SourceIPLocation, ThreatIntelIndicatorDescription
+  | order by TimeGenerated desc
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: UserPrincipalName

@@ -1,0 +1,30 @@
+id: c8e89b70-0852-4dbc-9e66-1ac527054057
+name: Global admin sign-ins to cloud applications [DCSecurityOperations]
+description: |
+  'Global admin sign-ins to cloud applications. Look for suspicious global admin accounts, or inappropriate apps for global admin use.'
+requiredDataConnectors:
+  - connectorId: AzureActiveDirectory
+    dataTypes:
+      - AuditLogs
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1078.004
+query: |
+
+  // Global admin sign-ins to cloud applications. Look for suspicious global admin accounts, or inappropriate apps for global admin use.
+  SigninLogs
+  | where TimeGenerated > ago(1d)
+  | join kind=inner (IdentityInfo
+      | where TimeGenerated > ago(14d)
+      )
+      on $left.UserId == $right.AccountObjectId
+  | where AssignedRoles contains "Global Administrator"
+  | sort by TimeGenerated
+  | summarize SignIns=count() by GlobalAdmin=UserPrincipalName, Application=AppDisplayName
+  | order by GlobalAdmin asc
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AadUserId
+        columnName: GlobalAdmin
