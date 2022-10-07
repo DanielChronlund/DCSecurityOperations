@@ -12,7 +12,7 @@ relevantTechniques:
   - T1078.004
 query: |
 
-  // Sign-ins targeted by Conditional Access, originating from an unknown network (not in Named Location), that don't require MFA. The purpose is to find sign-ins originating from untrusted networks that still don't require MFA.
+  // Sign-ins targeted by Conditional Access, originating from an unknown network (not in Named Location), that don't require MFA. The purpose is to find sign-ins originating from untrusted networks that still don't require MFA [DCSecurityOperations].
   SigninLogs
   | where TimeGenerated > ago(30d)
   | where AuthenticationRequirement != "multiFactorAuthentication"

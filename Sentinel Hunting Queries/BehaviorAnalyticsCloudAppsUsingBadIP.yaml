@@ -1,0 +1,32 @@
+id: 24a01761-0670-49d3-9d41-061b3ff373e2
+name: Recent cloud app activity originating from, by Microsoft, known bad IP addresses [DCSecurityOperations]
+description: |
+  'Hunt for threat intelligence matches in the Sentinel UEBA table and Defender for Cloud Apps. This will indicate if any cloud app is accessed from an IP-address associated with a, by Microsoft, known threat.'
+requiredDataConnectors:
+  - connectorId: BehaviorAnalytics, CloudAppEvents
+    dataTypes:
+      - BehaviorAnalytics, CloudAppEvents
+tactics:
+  - Execution
+relevantTechniques:
+  - 
+query: |
+
+  // Recent cloud app activity originating from, by Microsoft, known bad IP addresses.
+  let BadIPAddresses = BehaviorAnalytics
+    | where TimeGenerated > ago(30d)
+    | extend ThreatIntelIndicatorDescription = DevicesInsights.ThreatIntelIndicatorDescription
+    | where isnotempty( ThreatIntelIndicatorDescription )
+    | project SourceIPAddress, ThreatIntelIndicatorDescription;
+  CloudAppEvents
+    | where TimeGenerated > ago(30d)
+      | join kind=inner (
+          BadIPAddresses
+      ) on $left.IPAddress == $right.SourceIPAddress
+      | summarize LastActivity=max(TimeGenerated), count() by AccountDisplayName, Application, IPAddress, ISP, CountryCode, tostring(ThreatIntelIndicatorDescription)
+      | order by IPAddress, AccountDisplayName
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: AccountDisplayName
+        columnName: UserPrincipalName
