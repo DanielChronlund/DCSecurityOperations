@@ -16,10 +16,10 @@ query: |
   AuditLogs
   | where TimeGenerated > ago(30days)
   | where OperationName in ("Authentication Methods Policy Reset", "Authentication Methods Policy Update", "Authentication Strength Combination Configuration Create", "Authentication Strength Combination Configuration Delete", "Authentication Strength Combination Configuration Update", "Authentication Strength Policy Create", "Authentication Strength Policy Delete", "Authentication Strength Policy Update", "Disable Strong Authentication", "Update the company default cross-tenant access setting", "Update security defaults", "Update authorization policy", "Update Sign-In Risk Policy", "Set password policy", "Set domain authentication", "Set device registration policies", "Reveal local administrator password", "Reset the cross-tenant access default setting")
-  | project TimeGenerated, OperationName, InitiatedBy=InitiatedBy.user.userPrincipalName, TargetResources
+  | project TimeGenerated, OperationName, InitiatedByUpn=InitiatedBy.user.userPrincipalName, InitiatedById=InitiatedBy.user.id, TargetResources
   | order by TimeGenerated desc
 entityMappings:
   - entityType: Account
     fieldMappings:
       - identifier: AadUserId
-        columnName: InitiatedBy
+        columnName: InitiatedById

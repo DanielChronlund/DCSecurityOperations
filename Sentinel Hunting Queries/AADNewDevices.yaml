@@ -33,5 +33,7 @@ query: |
 entityMappings:
   - entityType: Host
     fieldMappings:
+      - identifier: AzureID
+        columnName: DeviceID
       - identifier: HostName
         columnName: DeviceName

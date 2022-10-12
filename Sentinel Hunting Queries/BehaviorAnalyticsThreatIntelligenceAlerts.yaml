@@ -17,10 +17,10 @@ query: |
   | where TimeGenerated > ago(90d)
   | extend ThreatIntelIndicatorDescription = DevicesInsights.ThreatIntelIndicatorDescription
   | where isnotempty( ThreatIntelIndicatorDescription ) 
-  | project TimeGenerated, ActivityType, UserPrincipalName, SourceIPAddress, SourceIPLocation, ThreatIntelIndicatorDescription
+  | project TimeGenerated, ActivityType, UserPrincipalName, UserId=UsersInsights.AccountObjectID, SourceIPAddress, SourceIPLocation, ThreatIntelIndicatorDescription
   | order by TimeGenerated desc
 entityMappings:
   - entityType: Account
     fieldMappings:
       - identifier: AadUserId
-        columnName: UserPrincipalName
+        columnName: UserId

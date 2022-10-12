@@ -23,10 +23,10 @@ query: |
       | join kind=inner (
           BadIPAddresses
       ) on $left.IPAddress == $right.SourceIPAddress
-      | summarize LastActivity=max(TimeGenerated), count() by AccountDisplayName, Application, IPAddress, ISP, CountryCode, tostring(ThreatIntelIndicatorDescription)
+      | summarize LastActivity=max(TimeGenerated), count() by AccountDisplayName, AccountId, Application, IPAddress, ISP, CountryCode, tostring(ThreatIntelIndicatorDescription)
       | order by IPAddress, AccountDisplayName
 entityMappings:
   - entityType: Account
     fieldMappings:
-      - identifier: AccountDisplayName
-        columnName: UserPrincipalName
+      - identifier: AadUserId
+        columnName: AccountId

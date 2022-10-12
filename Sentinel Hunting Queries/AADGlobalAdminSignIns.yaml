@@ -21,10 +21,10 @@ query: |
       on $left.UserId == $right.AccountObjectId
   | where AssignedRoles contains "Global Administrator"
   | sort by TimeGenerated
-  | summarize SignIns=count() by GlobalAdmin=UserPrincipalName, Application=AppDisplayName
-  | order by GlobalAdmin asc
+  | summarize SignIns=count() by GlobalAdminUpn=UserPrincipalName, GlobalAdminId=UserId, Application=AppDisplayName
+  | order by GlobalAdminId asc
 entityMappings:
   - entityType: Account
     fieldMappings:
       - identifier: AadUserId
-        columnName: GlobalAdmin
+        columnName: GlobalAdminId

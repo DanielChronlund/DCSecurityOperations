@@ -24,11 +24,11 @@ query: |
   | where AppDisplayName != "Microsoft Office Web Apps Service"
   | where AppDisplayName != "Microsoft Account Controls V2"
   | where ResourceDisplayName != "Microsoft Intune Enrollment"
-  | project UserPrincipalName, AppDisplayName, ResourceDisplayName, NetworkLocationDetails, AuthenticationRequirement
+  | project UserPrincipalName, UserId, AppDisplayName, ResourceDisplayName, NetworkLocationDetails, AuthenticationRequirement
   | summarize count() by UserPrincipalName, AppDisplayName, ResourceDisplayName, AuthenticationRequirement
   | sort by UserPrincipalName asc, count_ desc
 entityMappings:
   - entityType: Account
     fieldMappings:
       - identifier: AadUserId
-        columnName: UserPrincipalName
+        columnName: UserId

@@ -16,10 +16,10 @@ query: |
   AuditLogs
   | where TimeGenerated > ago(30d)
   | where OperationName in ("Add conditional access policy", "Update conditional access policy", "Delete conditional access policy")
-  | project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedBy=InitiatedBy.user.userPrincipalName, result=Result, oldPolicy=TargetResources[0].modifiedProperties[0].oldValue, newPolicy=TargetResources[0].modifiedProperties[0].newValue
+  | project TimeGenerated, OperationName, policy=TargetResources[0].displayName, modifiedByUpn=InitiatedBy.user.userPrincipalName, modifiedById=InitiatedBy.user.id, result=Result, oldPolicy=TargetResources[0].modifiedProperties[0].oldValue, newPolicy=TargetResources[0].modifiedProperties[0].newValue
   | order by TimeGenerated
 entityMappings:
   - entityType: Account
     fieldMappings:
       - identifier: AadUserId
-        columnName: modifiedBy
+        columnName: modifiedById

@@ -16,10 +16,10 @@ query: |
   AuditLogs
   | where TimeGenerated > ago(30days)
   | where OperationName in ("ConfirmAccountCompromised", "ConfirmCompromised", "ConfirmSafe", "ConfirmServicePrincipalCompromised", "confirmServicePrincipalCompromised", "dismissServicePrincipal")
-  | project TimeGenerated, OperationName, ResultDescription, InitiatedBy=InitiatedBy.user.userPrincipalName, TargetResources
+  | project TimeGenerated, OperationName, ResultDescription, InitiatedByUpn=InitiatedBy.user.userPrincipalName, InitiatedById=InitiatedBy.user.id, TargetResources
   | order by TimeGenerated desc
 entityMappings:
   - entityType: Account
     fieldMappings:
       - identifier: AadUserId
-        columnName: InitiatedBy
+        columnName: InitiatedById
