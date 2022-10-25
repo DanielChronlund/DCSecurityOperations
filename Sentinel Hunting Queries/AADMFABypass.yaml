@@ -19,6 +19,7 @@ query: |
   | where tostring(NetworkLocationDetails) == "[]"
   | where ResultType == 0
   | where ConditionalAccessStatus == "success"
+  | where todynamic(AuthenticationDetails)[0].authenticationMethod != "Windows Hello for Business"
   | where AppDisplayName != "Microsoft Intune Company Portal"
   | where AppDisplayName != "Microsoft Intune Web Company Portal"
   | where AppDisplayName != "Microsoft Office Web Apps Service"

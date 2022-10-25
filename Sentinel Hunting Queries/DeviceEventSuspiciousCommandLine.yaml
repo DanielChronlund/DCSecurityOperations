@@ -1,0 +1,26 @@
+id: 767f176d-9b87-4e80-8eba-92bd77a25b14
+name: Suspicious command line events [DCSecurityOperations]
+description: |
+  'Hunt for suspicious command line events on Defender for Endpoint protected devices. This can be events like PsExec or SSH. These events are uncommond and should be investigated further.'
+requiredDataConnectors:
+  - connectorId: MicrosoftThreatProtection
+    dataTypes:
+      - DeviceProcessEvents
+tactics:
+  - Execution
+relevantTechniques:
+  - T1059
+query: |
+
+  // Suspicious command line events [DCSecurityOperations].
+  DeviceProcessEvents
+  | where InitiatingProcessCommandLine has_any ("PsExec.exe", "whoami", "ping 8.8.8.8", "TASKLIST /v", "sc queryex", "wevtutil el", "SYSTEMINFO", "dsquery user", "powershell -command", "wmic useraccount", "C:\\Temp\\", "ssh", "-p 443", "ADMIN$", "wbadmin.exe delete", "vssadmin.exe delete")
+  | project TimeGenerated, DeviceId, DeviceName, AccountName, InitiatingProcessCommandLine, InitiatingProcessFolderPath, InitiatingProcessFileName
+  | order by TimeGenerated desc
+entityMappings:
+  - entityType: Host
+    fieldMappings:
+      - identifier: AzureID
+        columnName: DeviceId
+      - identifier: HostName
+        columnName: DeviceName
