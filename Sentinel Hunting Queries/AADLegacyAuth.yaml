@@ -14,7 +14,6 @@ query: |
 
   // Legacy authentication in Azure AD [DCSecurityOperations].
   SigninLogs
-  | where TimeGenerated > ago(30d)
   | where Status.errorCode == 0
   | where ClientAppUsed !in("Browser", "modern clients", "Mobile Apps and Desktop clients", "")
   | summarize count() by UserPrincipalName, UserId, AppDisplayName, ClientAppUsed

@@ -17,12 +17,10 @@ query: |
   // Recently created Azure AD service principals created by new user accounts [DCSecurityOperations].
   let NewUsers = AuditLogs
       | where OperationName == "Add user"
-      | where TimeGenerated > ago(30days)
       | extend UserID = tostring(TargetResources[0].id)
       | project NewUser = TargetResources[0].userPrincipalName, UserID, UserCreated = TimeGenerated;
   let NewServicePrincipals = AuditLogs
       | where OperationName == "Add service principal"
-      | where TimeGenerated > ago(30days)
       | project ServicePrincipalDisplayName = TargetResources[0].displayName, ServicePrincipalCreated = TimeGenerated, InitiatedBy = InitiatedBy.user.userPrincipalName;
   NewServicePrincipals
       | extend InitiatedBy = tostring(InitiatedBy)

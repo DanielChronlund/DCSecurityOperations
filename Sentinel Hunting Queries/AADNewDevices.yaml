@@ -15,11 +15,9 @@ query: |
   // Newly registered devices in Azure AD [DCSecurityOperations].
   let NewDevices = AuditLogs
       | where OperationName == "Register device"
-      | where TimeGenerated > ago(30d)
       | project TimeGenerated, DeviceID=AdditionalDetails[4].value, OS=AdditionalDetails[3].value, DeviceTrustType=AdditionalDetails[2].value, InitiatedBy=InitiatedBy.user.userPrincipalName;
   let DisplayNames = AuditLogs
       | where OperationName == "Add device"
-      | where TimeGenerated > ago(30d)
       | extend Replaced=replace_string(tostring(TargetResources[0].modifiedProperties[6].newValue), '[\"', '')
       | project DeviceID=replace_string(Replaced, '\"]', ''), DeviceName=TargetResources[0].displayName;
   NewDevices

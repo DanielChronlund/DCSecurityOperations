@@ -1,7 +1,7 @@
-id: 767f176d-9b87-4e80-8eba-92bd77a25b14
-name: Suspicious command line events [DCSecurityOperations]
+id: cf71d178-321f-4f7a-84bf-966d6ac89d3d
+name: SSH running as "NT AUTHORITY\System" [DCSecurityOperations]
 description: |
-  'Hunt for suspicious command line events on Defender for Endpoint protected devices. This can be events like PsExec or SSH. These events are uncommond and should be investigated further.'
+  'Hunt for unauthorized usage of SSH in your network. SSH should not run as "NT AUTHORITY\System".'
 requiredDataConnectors:
   - connectorId: MicrosoftThreatProtection
     dataTypes:
@@ -14,8 +14,8 @@ query: |
 
   // Suspicious command line events [DCSecurityOperations].
   DeviceProcessEvents
-  | where InitiatingProcessCommandLine has_any ("PsExec.exe", "whoami", "ping 8.8.8.8", "TASKLIST /v", "sc queryex", "wevtutil el", "SYSTEMINFO", "dsquery user", "powershell -command", "wmic useraccount", "C:\\Temp\\", "net use", "pushd", "ssh", "-p 443", "ADMIN$", "wbadmin.exe delete", "vssadmin.exe delete")
-  | where AccountName != "system"
+  | where InitiatingProcessCommandLine in ("ssh", "-p 443")
+  | where AccountSid == "S-1-5-18"
   | project TimeGenerated, DeviceId, DeviceName, AccountName, InitiatingProcessCommandLine, InitiatingProcessFolderPath, InitiatingProcessFileName
   | order by TimeGenerated desc
 entityMappings:

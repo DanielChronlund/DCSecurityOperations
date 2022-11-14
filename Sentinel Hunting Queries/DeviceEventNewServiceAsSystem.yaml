@@ -1,0 +1,32 @@
+id: 82566367-baa1-4f6d-8199-508eb91a05d0
+name: Administrator accounts creating services that execute as System [DCSecurityOperations]
+description: |
+  'Administrator accounts creating services that execute as System. This is a common privilege escalation technique.'
+requiredDataConnectors:
+  - connectorId: MicrosoftThreatProtection
+    dataTypes:
+      - DeviceProcessEvents
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1543.003
+query: |
+
+  // Administrator accounts creating services that execute as System. This is a common privilege escalation technique [DCSecurityOperations].
+  DeviceEvents
+  | where ActionType == "ServiceInstalled"
+  | where AdditionalFields.ServiceAccount == "system" or AdditionalFields.ServiceAccount == "LocalSystem"
+  | where InitiatingProcessAccountUpn != ""
+  | project TimeGenerated, ServiceName=AdditionalFields.ServiceName, ServiceAccount=AdditionalFields.ServiceAccount, DeviceName, DeviceId, FolderPath, FileName, InitiatingProcessAccountUpn, InitiatingProcessAccountName, InitiatingProcessAccountObjectId
+  | order by TimeGenerated desc
+entityMappings:
+  - entityType: Host
+    fieldMappings:
+      - identifier: AzureID
+        columnName: DeviceId
+      - identifier: HostName
+        columnName: DeviceName
+  - entityType: Account
+    fieldMappings:
+        identifier: AadUserId
+        columnName: InitiatingProcessAccountObjectId

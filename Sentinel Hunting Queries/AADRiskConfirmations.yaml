@@ -14,7 +14,6 @@ query: |
 
   // Risk confirmations in Azure AD Identity Protection [DCSecurityOperations].
   AuditLogs
-  | where TimeGenerated > ago(30days)
   | where OperationName in ("ConfirmAccountCompromised", "ConfirmCompromised", "ConfirmSafe", "ConfirmServicePrincipalCompromised", "confirmServicePrincipalCompromised", "dismissServicePrincipal")
   | project TimeGenerated, OperationName, ResultDescription, InitiatedByUpn=InitiatedBy.user.userPrincipalName, InitiatedById=InitiatedBy.user.id, TargetResources
   | order by TimeGenerated desc

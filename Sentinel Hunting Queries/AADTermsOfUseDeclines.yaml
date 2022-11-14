@@ -14,7 +14,6 @@ query: |
 
   // Users declining Conditional Access Terms of Use (potential insider risk) [DCSecurityOperations].
   AuditLogs
-  | where TimeGenerated > ago(30days)
   | where OperationName in ("Decline Terms Of Use")
   | project TimeGenerated, OperationName, ResultDescription, InitiatedByUpn=InitiatedBy.user.userPrincipalName, InitiatedById=InitiatedBy.user.id, TargetResources
   | order by TimeGenerated desc

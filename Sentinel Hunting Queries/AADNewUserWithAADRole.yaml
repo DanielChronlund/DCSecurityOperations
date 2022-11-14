@@ -16,11 +16,9 @@ query: |
 
   // New Azure AD users added to Azure AD roles [DCSecurityOperations].
   let NewUsers = AuditLogs
-      | where TimeGenerated > ago(30d)
       | where ActivityDisplayName == "Add user"
       | extend UserID = tostring(TargetResources[0].id);
   let NewAdmins = AuditLogs
-      | where TimeGenerated > ago(30d)
       | where ActivityDisplayName == "Add member to role"
       | extend UserID = tostring(TargetResources[0].id);
   NewUsers

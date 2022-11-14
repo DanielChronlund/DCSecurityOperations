@@ -14,12 +14,10 @@ query: |
 
   // Recent cloud app activity originating from, by Microsoft, known bad IP addresses.
   let BadIPAddresses = BehaviorAnalytics
-    | where TimeGenerated > ago(30d)
     | extend ThreatIntelIndicatorDescription = DevicesInsights.ThreatIntelIndicatorDescription
     | where isnotempty( ThreatIntelIndicatorDescription )
     | project SourceIPAddress, ThreatIntelIndicatorDescription;
   CloudAppEvents
-    | where TimeGenerated > ago(30d)
       | join kind=inner (
           BadIPAddresses
       ) on $left.IPAddress == $right.SourceIPAddress

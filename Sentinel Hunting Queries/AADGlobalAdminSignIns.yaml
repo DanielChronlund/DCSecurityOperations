@@ -15,9 +15,8 @@ query: |
   // Global admin sign-ins to cloud applications. Look for suspicious global admin accounts, or inappropriate apps for global admin use.
   SigninLogs
   | where TimeGenerated > ago(1d)
-  | join kind=inner (IdentityInfo
-      | where TimeGenerated > ago(14d)
-      )
+  | where ResultType == 0
+  | join kind=inner (IdentityInfo)
       on $left.UserId == $right.AccountObjectId
   | where AssignedRoles contains "Global Administrator"
   | sort by TimeGenerated

@@ -14,7 +14,6 @@ query: |
 
   // Administrative Unit events in Azure AD audit logs [DCSecurityOperations].
   AuditLogs
-  | where TimeGenerated > ago(30days)
   | where OperationName in ("Add administrative unit", "Delete administrative unit", "Update administrative unit")
   | project TimeGenerated, OperationName, InitiatedByUpn=InitiatedBy.user.userPrincipalName, InitiatedById=InitiatedBy.user.id, TargetResources
   | order by TimeGenerated desc

@@ -1,0 +1,31 @@
+id: 82736652-74fd-42e7-a8e2-5aeef31e456f
+name: New service creations with anomalous path. [DCSecurityOperations]
+description: |
+  'New service creations should be monitored for anomalous paths or executables since this tactic is often used by malicious actors. This is a common privilege escalation technique.'
+requiredDataConnectors:
+  - connectorId: MicrosoftThreatProtection
+    dataTypes:
+      - DeviceProcessEvents
+tactics:
+  - Persistence
+relevantTechniques:
+  - T1543.003
+query: |
+
+  // New service creations with anomalous path. [DCSecurityOperations].
+  DeviceEvents
+  | where ActionType == "ServiceInstalled"
+  | where FolderPath in ("C:\\Temp\\", "C:\\ProgramData\\", "C:\\Windows\\", "C:\\Windows\\Temp\\", "C:\\")
+  | project TimeGenerated, ServiceName=AdditionalFields.ServiceName, ServiceAccount=AdditionalFields.ServiceAccount, DeviceName, DeviceId, FolderPath, FileName, InitiatingProcessAccountUpn, InitiatingProcessAccountName, InitiatingProcessAccountObjectId
+  | order by TimeGenerated desc
+entityMappings:
+  - entityType: Host
+    fieldMappings:
+      - identifier: AzureID
+        columnName: DeviceId
+      - identifier: HostName
+        columnName: DeviceName
+  - entityType: Account
+    fieldMappings:
+        identifier: AadUserId
+        columnName: InitiatingProcessAccountObjectId

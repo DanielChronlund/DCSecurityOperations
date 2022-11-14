@@ -14,7 +14,6 @@ query: |
 
   // UEBA threat intelligence alerts like Tor exit nodes, bot net members and other threats.
   BehaviorAnalytics
-  | where TimeGenerated > ago(90d)
   | extend ThreatIntelIndicatorDescription = DevicesInsights.ThreatIntelIndicatorDescription
   | where isnotempty( ThreatIntelIndicatorDescription ) 
   | project TimeGenerated, ActivityType, UserPrincipalName, UserId=UsersInsights.AccountObjectID, SourceIPAddress, SourceIPLocation, ThreatIntelIndicatorDescription
