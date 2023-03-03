@@ -15,7 +15,7 @@ query: |
   // Sign-ins targeted by Conditional Access, originating from an unknown network (not in Named Location), that don't require MFA. The purpose is to find sign-ins originating from untrusted networks that still don't require MFA [DCSecurityOperations].
   SigninLogs
   | where AuthenticationRequirement != "multiFactorAuthentication"
-  | where HomeTenantId != ResourceTenantId
+  | where HomeTenantId == ResourceTenantId
   | where tostring(NetworkLocationDetails) == "[]"
   | where ResultType == 0
   | where ConditionalAccessStatus == "success"

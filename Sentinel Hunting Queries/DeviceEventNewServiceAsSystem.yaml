@@ -17,7 +17,7 @@ query: |
   | where ActionType == "ServiceInstalled"
   | where AdditionalFields.ServiceAccount == "system" or AdditionalFields.ServiceAccount == "LocalSystem"
   | where InitiatingProcessAccountUpn != ""
-  | project TimeGenerated, ServiceName=AdditionalFields.ServiceName, ServiceAccount=AdditionalFields.ServiceAccount, DeviceName, DeviceId, FolderPath, FileName, InitiatingProcessAccountUpn, InitiatingProcessAccountName, InitiatingProcessAccountObjectId
+  | project TimeGenerated, ServiceName=AdditionalFields.ServiceName, ServiceAccount=AdditionalFields.ServiceAccount, DeviceName, DeviceId, FolderPath, FileName, InitiatingProcessFolderPath, InitiatingProcessAccountUpn, InitiatingProcessAccountName, InitiatingProcessAccountObjectId
   | order by TimeGenerated desc
 entityMappings:
   - entityType: Host
